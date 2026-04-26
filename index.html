@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Invoice</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<style>
+body { font-family: Arial; font-size: 13px; }
+.container { width: 190mm; margin: auto; }
+
+table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+
+td { padding: 6px; vertical-align: top; }
+
+/* header */
+.header-row td {
+  border-top: 2px solid #000;
+  border-bottom: 2px solid #000;
+  font-weight: bold;
+}
+
+/* row */
+.data-row td { border-bottom: 1px solid #000; }
+
+.line-box {
+  border-top: 2px solid #000;
+  border-bottom: 2px solid #000;
+}
+
+.center { text-align: center; font-weight: bold; }
+.right { text-align: right; }
+
+/* inputs visible */
+input, textarea {
+  border: 0px solid #ccc;
+  width: 100%;
+  font-size: 13px;
+  padding: 2px;
+}
+
+textarea { resize: none; line-height: 1.3; }
+
+/* description */
+.desc-line {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2px;
+}
+.desc-line textarea { width: 90%; }
+.desc-line .dash { width: 10%; text-align: right; }
+
+/* RCM */
+.rcm-box {
+  width: 55%;
+  border: 2px solid #000;
+  margin-top: 10px;
+}
+.rcm-box td {
+  border: 1px solid #000;
+  padding: 4px;
+  font-size: 12px;
+}
+td.c1 {
+    width: 100px;
+}
+/* button */
+.btn { margin: 10px; padding: 8px 15px; cursor: pointer; }
+
+.no-print {}
+tr.upbor {
+    border-top: 2px solid;
+}
+</style>
+</head>
+
+<body>
+
+<button class="btn no-print" onclick="downloadPDF()">Download PDF</button>
+
+<div id="invoice" class="container">
+
+<div class="center">TAX INVOICE</div>
+<h2 class="center">Sri Annamalaiyar Roadlines</h2>
+
+<table>
+<tr>
+<td>GSTIN:- 33CASPM9980R1ZC</td>
+<td>PAN No: CASPM9980R</td>
+</tr>
+<tr>
+<td>State: TN</td>
+<td>State Code: 33 &nbsp;&nbsp; Reverse Charge: Yes</td>
+</tr>
+</table>
+
+<table class="line-box">
+<tr>
+<td><b>INVOICE No.</b> <input value="77"></td>
+
+<td style="width:50%;">
+<div style="display:flex; justify-content:space-between;">
+<span><b>Invoice Date:</b></span>
+<input type="date" style="width:60%;">
+</div>
+</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td><b>BILL TO:</b></td>
+<td class="right"><b>Service At :</b></td>
+</tr>
+
+<tr>
+<td>
+<select id="companySelect" class="no-print">
+<option value="1">VISION FREIGHT SOLUTIONS INDIA PRIVATE LIMITED</option>
+<option value="2">PC Logistic Solutions</option>
+</select>
+
+<div id="company"></div>
+</td>
+
+<td class="right">Tamil Nadu, 600128</td>
+</tr>
+</table>
+
+<table>
+
+<!-- HEADER -->
+<tr class="header-row">
+<td class="c1">S.No</td>
+<td class="c1">SAC/HSN</td>
+<td  class="c2">Product / Description</td>
+<td  class="c1">Total Value</td>
+</tr>
+
+<!-- DATA -->
+<tr class="data-row">
+
+<td><input type="text" value="1"></td>
+
+<td><input type="text" value="996511"></td>
+
+<td>
+<div id="descWrapper">
+<textarea rows="2">Invoice For GTA Services for Month of MAR-26</textarea>
+</div>
+
+<button class="no-print" onclick="addDescLine()">+ Add</button>
+</td>
+
+<td><input id="val" type="number" value="20000"></td>
+
+</tr>
+
+<tr>
+<td colspan="4" style="text-align:center;">(As per Attachment)</td>
+</tr>
+
+</table>
+
+<table class="line-box">
+<tr><td class="c1"/><td class="c1"/><td class="c2"/><td class="c1"/></tr>
+<tr><td/><td/><td class="right">Total</td><td id="total"></td></tr>
+<tr><td/><td/><td class="right">Total Taxable Value</td><td id="tax"></td></tr>
+<tr><td/><td/><td class="right">CGST</td><td>-</td></tr>
+<tr><td/><td/><td class="right">SGST</td><td>-</td></tr>
+<tr class="upbor"><td/><td/><td class="right"><b>GRAND TOTAL INR</b></td><td id="grand"></td></tr>
+</table>
+
+<p><b id="words"></b></p>
+
+<p id="exemptText" style="display:none;">
+Exempted Supply – GST Not Applicable as per Notification
+</p>
+
+<p id="m1">
+GST is to be paid by Under Reverse Charge u/s 9(3) of CGST Act 2017/ u/s 5(3) of IGST Act 2017<br><br>
+GST Payable under RCM
+</p>
+<table id="rcmTable" class="rcm-box">
+<tr><td></td><td><b>Rate</b></td><td><b>Amt</b></td></tr>
+<tr><td>Taxable</td><td>-</td><td id="rcmTax"></td></tr>
+<tr><td>CGST</td><td>2.5%</td><td id="rcmCgst"></td></tr>
+<tr><td>SGST</td><td>2.5%</td><td id="rcmSgst"></td></tr>
+</table>
+
+<br>
+
+<p>Sri Annamalaiyar Roadlines</p>
+<p><b><i>Authorised signatory</i></b></p>
+<p class="center"><i>This is computer generated invoice</i></p>
+
+</div>
+
+<script>
+
+/* COMPANY */
+const companies = {
+1: `<b>VISION FREIGHT SOLUTIONS INDIA PRIVATE LIMITED</b><br>125, Paramount Logistics Pvt Ltd, Oragadam High Road Eraiyur Road, Vallam, Kancheepuram, Tamil Nadu, 602105.<br/><br/><b>GSTIN: 33AACCV8448A1ZI<br/>PAN No: AACCV8448A<br/>State:- Tamil Nadu <br/>State Code: 33</b>`,
+
+2: `<b>PC Logistic Solutions</b><br>
+No 68, Ground Floor, Sakthi Nagar, Nolambur, Chennai - 600 096.<br><br><b>PAN No: AACCV8448A<br>State:- Tamil Nadu<br>State Code: 33</b>`
+};
+
+
+document.getElementById("company").innerHTML = companies[1];
+
+document.getElementById("companySelect").addEventListener("change", function(){
+  let v = this.value;
+
+  document.getElementById("company").innerHTML = companies[v];
+
+  document.getElementById("rcmTable").style.display =
+    v == 2 ? "none" : "";
+
+  document.getElementById("exemptText").style.display =
+    v == 2 ? "block" : "none";
+    // 🔥 NEW: m1 toggle
+  document.getElementById("m1").style.display =
+    v == 1 ? "block" : "none";
+});
+
+/* ADD LINE */
+function addDescLine(){
+  let div = document.createElement("div");
+  div.classList.add("desc-line");
+
+  div.innerHTML = `
+    <textarea rows="2"></textarea>
+    <span class="dash">-</span>
+  `;
+
+  document.getElementById("descWrapper").appendChild(div);
+}
+
+/* CALC */
+document.getElementById("val").addEventListener("input", calc);
+
+function calc(){
+  let v = Number(document.getElementById("val").value || 0);
+
+  document.getElementById("total").innerText = format(v);
+  document.getElementById("tax").innerText = format(v);
+  document.getElementById("grand").innerText = format(v);
+
+  document.getElementById("rcmTax").innerText = format(v);
+  document.getElementById("rcmCgst").innerText = format(v * 0.025);
+  document.getElementById("rcmSgst").innerText = format(v * 0.025);
+
+  document.getElementById("words").innerText =
+    numberToWords(v) + " Only/-";
+}
+
+function format(x){ return x.toLocaleString('en-IN'); }
+
+/* WORDS */
+function numberToWords(num){
+
+  if(num === 0) return "Zero";
+
+  const a = ['', 'One','Two','Three','Four','Five','Six','Seven','Eight','Nine',
+  'Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen',
+  'Eighteen','Nineteen'];
+
+  const b = ['', '', 'Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
+
+  function inWords(n){
+    if(n < 20) return a[n];
+    if(n < 100) return b[Math.floor(n/10)] + (n%10 ? ' ' + a[n%10] : '');
+    if(n < 1000) return a[Math.floor(n/100)] + ' Hundred' + (n%100 ? ' ' + inWords(n%100) : '');
+    if(n < 100000) return inWords(Math.floor(n/1000)) + ' Thousand' + (n%1000 ? ' ' + inWords(n%1000) : '');
+    if(n < 10000000) return inWords(Math.floor(n/100000)) + ' Lakh' + (n%100000 ? ' ' + inWords(n%100000) : '');
+    return '';
+  }
+
+  return inWords(num);
+}
+
+/* PDF */
+function downloadPDF(){
+
+  calc();
+
+  document.querySelectorAll(".no-print").forEach(el=>el.style.display="none");
+
+  html2pdf().set({
+    margin: [5,5,5,5],
+    filename: "Invoice.pdf",
+    image: { type: 'jpeg', quality: 1 },
+    html2canvas: { scale: 4 },
+    jsPDF: { unit: "mm", format: "a4" }
+  }).from(document.getElementById("invoice")).save().then(()=>{
+    document.querySelectorAll(".no-print").forEach(el=>el.style.display="");
+  });
+}
+
+calc();
+
+</script>
+
+</body>
+</html>
