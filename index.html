@@ -2,6 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Invoice</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -162,6 +163,21 @@ tr.upbor {
 }
 .back-btn:hover { background: #eaf4fb; }
 .context-bar .selected-name { font-size: 13px; color: #556; }
+
+/* mobile */
+.invoice-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+@media (max-width: 640px) {
+  .topbar { padding: 22px 14px; }
+  .topbar h1 { font-size: 19px; }
+  .topbar .welcome { font-size: 13px; }
+  .selector-section { padding: 0 14px; }
+  .invoice-card { flex: 1 1 100%; max-width: 100%; }
+  .context-bar { padding: 0 14px; flex-wrap: wrap; gap: 8px; }
+  .btn { margin: 10px 14px; }
+}
 </style>
 </head>
 
@@ -210,6 +226,7 @@ tr.upbor {
 
 <button class="btn no-print" onclick="downloadPDF()">Download PDF</button>
 
+<div class="invoice-scroll">
 <div id="invoice" class="container">
 
 <div class="center" id="invoiceTitle">TAX INVOICE</div>
@@ -321,6 +338,7 @@ GST Payable under RCM
 <p><b><i>Authorised signatory</i></b></p>
 <p class="center"><i>This is computer generated invoice</i></p>
 
+</div>
 </div>
 
 </div>
