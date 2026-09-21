@@ -75,37 +75,165 @@ td.c3 {
 tr.upbor {
     border-top: 2px solid;
 }
+
+/* landing header */
+.topbar {
+  background: linear-gradient(135deg, #0f3d63, #1c6ea4);
+  color: #fff;
+  padding: 28px 20px;
+  text-align: center;
+  font-family: Arial, sans-serif;
+}
+.topbar h1 { margin: 0 0 6px 0; font-size: 24px; letter-spacing: 0.5px; }
+.topbar .welcome { margin: 0; font-size: 15px; opacity: 0.92; }
+
+/* company selector */
+.selector-section {
+  max-width: 190mm;
+  margin: 24px auto;
+  padding: 0 20px;
+  font-family: Arial, sans-serif;
+}
+.selector-section h3 {
+  text-align: center;
+  color: #0f3d63;
+  margin-bottom: 16px;
+}
+.card-grid {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.invoice-card {
+  flex: 1 1 220px;
+  max-width: 260px;
+  background: #fff;
+  border: 2px solid #e0e6ec;
+  border-radius: 10px;
+  padding: 18px;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.invoice-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+}
+.invoice-card.active {
+  border-color: #1c6ea4;
+  background: #eaf4fb;
+}
+.card-icon { font-size: 28px; margin-bottom: 8px; }
+.card-title { font-weight: bold; font-size: 14px; color: #0f3d63; margin-bottom: 4px; }
+.card-sub { font-size: 12px; color: #667; }
+
+@media print {
+  .no-print, .topbar, .selector-section { display: none !important; }
+}
+
+/* view switching */
+#landingView, #invoiceView { animation: fadeIn 0.35s ease; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.context-bar {
+  max-width: 190mm;
+  margin: 16px auto 0 auto;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: Arial, sans-serif;
+}
+.back-btn {
+  background: #fff;
+  border: 1px solid #1c6ea4;
+  color: #1c6ea4;
+  padding: 7px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: bold;
+  transition: background 0.15s ease;
+}
+.back-btn:hover { background: #eaf4fb; }
+.context-bar .selected-name { font-size: 13px; color: #556; }
 </style>
 </head>
 
 <body>
 
+<div id="landingView">
+
+<header class="topbar no-print">
+<h1>Sri Annamalaiyar Roadlines</h1>
+<p class="welcome">Welcome, Manikandan 👋</p>
+</header>
+
+<section class="selector-section no-print">
+<h3>Select Invoice</h3>
+<div class="card-grid">
+
+<div class="invoice-card" data-company="1" onclick="selectCompany(1)">
+<div class="card-icon">🚚</div>
+<div class="card-title">Vision Freight Solutions</div>
+<div class="card-sub">Tax Invoice · GTA Services</div>
+</div>
+
+<div class="invoice-card" data-company="2" onclick="selectCompany(2)">
+<div class="card-icon">📦</div>
+<div class="card-title">PC Logistic Solutions</div>
+<div class="card-sub">Tax Invoice · GTA Services</div>
+</div>
+
+<div class="invoice-card" data-company="3" onclick="selectCompany(3)">
+<div class="card-icon">🏗️</div>
+<div class="card-title">Indev Infra Pvt Ltd</div>
+<div class="card-sub">Bill of Supply · Vehicle Hire</div>
+</div>
+
+</div>
+</section>
+
+</div>
+
+<div id="invoiceView" style="display:none;">
+
+<div class="context-bar no-print">
+<button class="back-btn" onclick="goBack()">← Back to Invoices</button>
+<span class="selected-name" id="selectedName"></span>
+</div>
+
 <button class="btn no-print" onclick="downloadPDF()">Download PDF</button>
 
 <div id="invoice" class="container">
 
-<div class="center">TAX INVOICE</div>
+<div class="center" id="invoiceTitle">TAX INVOICE</div>
 <h2 class="center">Sri Annamalaiyar Roadlines</h2>
 
 <table>
 <tr>
-<td>GSTIN:- 33CASPM9980R1ZC</td>
+<td>State: TN</td>
 <td class="c3">PAN No: CASPM9980R</td>
 </tr>
 <tr>
-<td>State: TN</td>
-<td>State Code: 33 &nbsp;&nbsp; Reverse Charge: Yes</td>
+<td>State Code: 33</td>
+<td>GSTIN:- 33CASPM9980R1ZC &nbsp;&nbsp; Reverse Charge: Yes</td>
 </tr>
 </table>
 
 <table class="line-box">
 <tr>
-<td><b>INVOICE No.</b> <input value="0" style="width:50px !important;"></td>
+<td><b>INVOICE No.</b> <input value="0" style="width:auto; min-width:100px;"></td>
 
-<td style="width:50%;">
-<div style="display:flex; justify-content:space-between;">
+<td style="width:60%;">
+<div style="display:flex; justify-content:space-between; align-items:center;">
 <span><b>Invoice Date:</b></span>
-<input type="date" style="width:60%;">
+<input type="date" style="width:220px; min-width:180px;">
 </div>
 </td>
 </tr>
@@ -119,15 +247,10 @@ tr.upbor {
 
 <tr>
 <td>
-<select id="companySelect" class="no-print">
-<option value="1">VISION FREIGHT SOLUTIONS INDIA PRIVATE LIMITED</option>
-<option value="2">PC Logistic Solutions</option>
-</select>
-
 <div id="company"></div>
 </td>
 
-<td class="right">Tamil Nadu, 600128</td>
+<td class="right" id="serviceAt">Tamil Nadu, 600128</td>
 </tr>
 </table>
 
@@ -146,11 +269,11 @@ tr.upbor {
 
 <td><input type="text" value="1"></td>
 
-<td><input type="text" value="996511"></td>
+<td><input id="sac" type="text" value="996511"></td>
 
 <td>
 <div id="descWrapper">
-<textarea rows="2">Invoice For GTA Services for Month of MAR-26</textarea>
+<textarea id="descMain" rows="2">Invoice For GTA Services for Month of MAR-26</textarea>
 </div>
 
 <button class="no-print" onclick="addDescLine()">+ Add</button>
@@ -200,33 +323,89 @@ GST Payable under RCM
 
 </div>
 
+</div>
+
 <script>
 
 /* COMPANY */
 const companies = {
-1: `<b>VISION FREIGHT SOLUTIONS INDIA PRIVATE LIMITED</b><br>125, Paramount Logistics Pvt Ltd, Oragadam High Road Eraiyur Road, Vallam, Kancheepuram, Tamil Nadu, 602105.<br/><br/><b>GSTIN: 33AACCV8448A1ZI<br/>PAN No: AACCV8448A<br/>State:- Tamil Nadu <br/>State Code: 33</b>`,
+1: {
+  html: `<b>VISION FREIGHT SOLUTIONS INDIA PRIVATE LIMITED</b><br>125, Paramount Logistics Pvt Ltd, Oragadam High Road Eraiyur Road, Vallam, Kancheepuram, Tamil Nadu, 602105.<br/><br/><b>GSTIN: 33AACCV8448A1ZI<br/>PAN No: AACCV8448A<br/>State:- Tamil Nadu <br/>State Code: 33</b>`,
+  title: "TAX INVOICE",
+  serviceAt: "Tamil Nadu, 600128",
+  sac: "996511",
+  desc: "Invoice For GTA Services for Month of MAR-26",
+  showRCM: true,
+  showExempt: false,
+  showM1: true
+},
 
-2: `<b>PC Logistic Solutions</b><br>
-No 68, Ground Floor, Sakthi Nagar, Nolambur, Chennai - 600 096.<br><br><b>PAN No: AACCV8448A<br>State:- Tamil Nadu<br>State Code: 33</b>`
+2: {
+  html: `<b>PC Logistic Solutions</b><br>No 68, Ground Floor, Sakthi Nagar, Nolambur, Chennai - 600 096.<br><br><b>State:- Tamil Nadu<br>State Code: 33</b>`,
+  title: "TAX INVOICE",
+  serviceAt: "Tamil Nadu, 600128",
+  sac: "996511",
+  desc: "Invoice For GTA Services for Month of MAR-26",
+  showRCM: false,
+  showExempt: true,
+  showM1: false
+},
+
+3: {
+  html: `<b>INDEV INFRA PRIVATE LIMITED</b><br># 28, VGP Murphy Square, 2nd Cross Street, St. Thomas Mount, Chennai - 600016.`,
+  title: "BILL OF SUPPLY",
+  serviceAt: "Tamil Nadu, 600128",
+  sac: "996601",
+  desc: "Vehicle Hire Charges - Technology to CFS- Triway",
+  showRCM: false,
+  showExempt: true,
+  showM1: false
+}
 };
 
+function loadCompany(v){
+  const c = companies[v];
 
-document.getElementById("company").innerHTML = companies[1];
+  document.getElementById("company").innerHTML = c.html;
+  document.getElementById("invoiceTitle").innerText = c.title;
+  document.getElementById("serviceAt").innerText = c.serviceAt;
 
-document.getElementById("companySelect").addEventListener("change", function(){
-  let v = this.value;
+  document.getElementById("sac").value = c.sac;
+  document.getElementById("descMain").value = c.desc;
 
-  document.getElementById("company").innerHTML = companies[v];
+  document.getElementById("rcmTable").style.display = c.showRCM ? "" : "none";
+  document.getElementById("exemptText").style.display = c.showExempt ? "block" : "none";
+  document.getElementById("m1").style.display = c.showM1 ? "block" : "none";
+}
 
-  document.getElementById("rcmTable").style.display =
-    v == 2 ? "none" : "";
+loadCompany(1);
 
-  document.getElementById("exemptText").style.display =
-    v == 2 ? "block" : "none";
-    // 🔥 NEW: m1 toggle
-  document.getElementById("m1").style.display =
-    v == 1 ? "block" : "none";
-});
+const companyNames = {
+  1: "Vision Freight Solutions",
+  2: "PC Logistic Solutions",
+  3: "Indev Infra Pvt Ltd"
+};
+
+function selectCompany(v){
+  loadCompany(v);
+
+  document.querySelectorAll(".invoice-card").forEach(c => c.classList.remove("active"));
+  document.querySelector(`.invoice-card[data-company="${v}"]`).classList.add("active");
+
+  document.getElementById("selectedName").innerText = companyNames[v];
+
+  document.getElementById("landingView").style.display = "none";
+  document.getElementById("invoiceView").style.display = "block";
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function goBack(){
+  document.getElementById("invoiceView").style.display = "none";
+  document.getElementById("landingView").style.display = "block";
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
 
 /* ADD LINE */
 function addDescLine(){
